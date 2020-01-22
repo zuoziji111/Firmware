@@ -195,6 +195,10 @@ private:
 
 	void		InitializeVehicleIMU();
 
+	DEFINE_PARAMETERS(
+		(ParamInt<px4::params::SENS_IMU_MODE>) _param_sens_imu_mode
+	)
+
 };
 
 Sensors::Sensors(bool hil_enabled) :
@@ -202,7 +206,7 @@ Sensors::Sensors(bool hil_enabled) :
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::att_pos_ctrl),
 	_hil_enabled(hil_enabled),
 	_loop_perf(perf_alloc(PC_ELAPSED, "sensors")),
-	_voted_sensors_update(_parameters, hil_enabled)
+	_voted_sensors_update(_parameters, (_param_sens_imu_mode.get() == 1), hil_enabled)
 {
 	initialize_parameter_handles(_parameter_handles);
 
@@ -213,7 +217,9 @@ Sensors::Sensors(bool hil_enabled) :
 	_vehicle_angular_velocity.Start();
 	_vehicle_air_data.Start();
 
-	InitializeVehicleIMU();
+	if (_param_sens_imu_mode.get() == 0) {
+		InitializeVehicleIMU();
+	}
 }
 
 Sensors::~Sensors()
@@ -417,7 +423,7 @@ void Sensors::InitializeVehicleIMU()
 			gyro_sub.copy(&gyro);
 
 			if (accel.device_id > 0 && gyro.device_id > 0) {
-				VehicleIMU *imu = new VehicleIMU(i, i);
+				VehicleIMU *imu = new VehicleIMU(i, i, i);
 
 				if (imu != nullptr) {
 					// Start VehicleIMU instance and store
@@ -545,7 +551,11 @@ void Sensors::Run()
 	// when not adding sensors poll for param updates
 	if (!_armed && hrt_elapsed_time(&_last_config_update) > 500_ms) {
 		_voted_sensors_update.initializeSensors();
-		InitializeVehicleIMU();
+
+		if (_param_sens_imu_mode.get() == 0) {
+			InitializeVehicleIMU();
+		}
+
 		_last_config_update = hrt_absolute_time();
 
 	} else {
