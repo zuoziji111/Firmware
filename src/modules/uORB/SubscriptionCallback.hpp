@@ -128,7 +128,8 @@ public:
 	void call() override
 	{
 		// schedule immediately if no interval, otherwise check time elapsed
-		if ((_interval_us == 0) || (hrt_elapsed_time_atomic(&_last_update) >= _interval_us)) {
+		// interval check is relaxed to accommodate realistic sensor publication rate differences and occasional jitter
+		if ((_interval_us == 0) || (hrt_elapsed_time_atomic(&_last_update) >= (0.95f * _interval_us))) {
 			_work_item->ScheduleNow();
 		}
 	}
