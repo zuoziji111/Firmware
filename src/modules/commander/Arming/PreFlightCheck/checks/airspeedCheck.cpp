@@ -83,6 +83,19 @@ bool PreFlightCheck::airspeedCheck(orb_advert_t *mavlink_log_pub, vehicle_status
 	}
 
 	/*
+	 * Check if airspeed is declared valid or not by airspeed selector.
+	 */
+	if (!PX4_ISFINITE(airspeed_validated.equivalent_airspeed_m_s)) {
+		if (report_fail) {
+			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Airspeed invalid.");
+		}
+
+		present = true;
+		success = false;
+		goto out;
+	}
+
+	/*
 	 * Check if airspeed is higher than maximally accepted while the vehicle is landed / not flying
 	 * Negative and positive offsets are considered. Do not check anymore while arming because pitot cover
 	 * might have been removed.
