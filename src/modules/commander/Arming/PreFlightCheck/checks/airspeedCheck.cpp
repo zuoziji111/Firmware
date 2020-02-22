@@ -44,7 +44,7 @@
 using namespace time_literals;
 
 bool PreFlightCheck::airspeedCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &status, const bool optional,
-				   const bool report_fail, const bool prearm)
+				   const bool report_fail, const bool prearm, const float arming_max_airspeed_allowed)
 {
 	bool present = true;
 	bool success = true;
@@ -54,8 +54,8 @@ bool PreFlightCheck::airspeedCheck(orb_advert_t *mavlink_log_pub, vehicle_status
 	const airspeed_validated_s &airspeed_validated = airspeed_validated_sub.get();
 
 	/*
-+	 * Check if Airspeed Selector is up and running.
-+	 */
+	 * Check if Airspeed Selector is up and running.
+	 */
 	if (hrt_elapsed_time(&airspeed_validated.timestamp) > 1_s) {
 		if (report_fail && !optional) {
 			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Airspeed Selector module down.");
@@ -83,11 +83,11 @@ bool PreFlightCheck::airspeedCheck(orb_advert_t *mavlink_log_pub, vehicle_status
 	}
 
 	/*
-	 * Check if airspeed is higher than 4m/s (accepted max) while the vehicle is landed / not flying
+	 * Check if airspeed is higher than maximally accepted while the vehicle is landed / not flying
 	 * Negative and positive offsets are considered. Do not check anymore while arming because pitot cover
 	 * might have been removed.
 	 */
-	if (fabsf(airspeed_validated.equivalent_airspeed_m_s) > 4.0f && prearm) {
+	if (fabsf(airspeed_validated.equivalent_airspeed_m_s) > arming_max_airspeed_allowed && prearm) {
 		if (report_fail) {
 			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: check Airspeed Cal or Pitot");
 		}
