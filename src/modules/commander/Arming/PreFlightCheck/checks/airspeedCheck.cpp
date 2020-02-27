@@ -111,7 +111,7 @@ bool PreFlightCheck::airspeedCheck(orb_advert_t *mavlink_log_pub, vehicle_status
 	}
 
 out:
-	set_health_flags(subsystem_info_s::SUBSYSTEM_TYPE_DIFFPRESSURE, present, !optional, success, status);
+	set_health_flags(subsystem_info_s::SUBSYSTEM_TYPE_AIRSPEED, present, !optional, success, status);
 
 	return success;
 }
