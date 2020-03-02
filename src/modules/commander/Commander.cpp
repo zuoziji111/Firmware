@@ -3475,7 +3475,7 @@ void *commander_low_prio_loop(void *arg)
 		}
 	}
 
-	px4_close(cmd_sub);
+	orb_unsubscribe(cmd_sub);
 
 	return nullptr;
 }
