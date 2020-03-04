@@ -239,7 +239,8 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 		float arming_max_airspeed_allowed = 4.0f;
 		param_get(param_find("ASPD_MAX_ARM"), &arming_max_airspeed_allowed);
 
-		if (!airspeedCheck(mavlink_log_pub, status, (bool)optional, reportFailures, prearm, arming_max_airspeed_allowed) && !(bool)optional) {
+		if (!airspeedCheck(mavlink_log_pub, status, (bool)optional, reportFailures, prearm, arming_max_airspeed_allowed)
+		    && !(bool)optional) {
 			failed = true;
 		}
 	}

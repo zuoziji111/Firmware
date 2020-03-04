@@ -98,7 +98,7 @@ void print_health_flags(const vehicle_status_s &status)
 	_print_sub("ACC", status, subsystem_info_s::SUBSYSTEM_TYPE_ACC);
 	_print_sub("MAG", status, subsystem_info_s::SUBSYSTEM_TYPE_MAG);
 	_print_sub("PRESS", status, subsystem_info_s::SUBSYSTEM_TYPE_ABSPRESSURE);
-	_print_sub("AIRSP", status, subsystem_info_s::SUBSYSTEM_TYPE_DIFFPRESSURE);
+	_print_sub("AIRSP", status, subsystem_info_s::SUBSYSTEM_TYPE_AIRSPEED);
 	_print_sub("GPS", status, subsystem_info_s::SUBSYSTEM_TYPE_GPS);
 	_print_sub("OPT", status, subsystem_info_s::SUBSYSTEM_TYPE_OPTICALFLOW);
 	_print_sub("VIO", status, subsystem_info_s::SUBSYSTEM_TYPE_CVPOSITION);

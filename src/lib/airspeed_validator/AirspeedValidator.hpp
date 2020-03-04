@@ -126,7 +126,7 @@ private:
 	float _EAS{0.0f}; ///< equivalent airspeed in m/s
 	float _TAS{0.0f}; ///< true airspeed in m/s
 	float _EAS_scale{1.0f}; ///< scale factor from IAS to EAS
-	float _airspeed_confidence{0.0f}; ///< metric form airspeed driver indicating current confidence level of the data
+	float _airspeed_confidence{0.0f}; ///< metric from airspeed driver indicating current confidence level of the data
 
 	uint64_t	_time_last_airspeed{0};		///< time last airspeed measurement was received (uSec)
 
