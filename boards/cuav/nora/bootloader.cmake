@@ -5,8 +5,7 @@ px4_add_board(
 	MODEL nora
 	LABEL bootloader
 	TOOLCHAIN arm-none-eabi
-    ARCHITECTURE cortex-m7
-
+	ARCHITECTURE cortex-m7
 
 	DRIVERS
 #	bootloader

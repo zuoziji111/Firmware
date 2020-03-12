@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2016 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2020 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -46,6 +46,7 @@ if("${PX4_BOARD_LABEL}" STREQUAL  "bootloader")
 else()
 	add_library(drivers_board
 		can.c
+		i2c.cpp
 		init.c
 		led.c
 		manifest.c
@@ -58,6 +59,7 @@ else()
 
 	target_link_libraries(drivers_board
 		PRIVATE
+			arch_spi
 			arch_board_hw_info
 			drivers__led # drv_led_start
 			nuttx_arch # sdio

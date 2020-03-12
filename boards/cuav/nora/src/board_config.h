@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -67,9 +67,6 @@
 #define PX4IO_SERIAL_RCC_EN            RCC_APB1LENR_UART8EN
 #define PX4IO_SERIAL_CLOCK             STM32_PCLK1_FREQUENCY
 #define PX4IO_SERIAL_BITRATE           1500000               /* 1.5Mbps -> max rate for IO */
-#define STM32_RCC_APB1ENR  STM32_RCC_APB1LENR
-#define RCC_APB1ENR_TIM3EN RCC_APB1LENR_TIM3EN
-
 
 /* Configuration ************************************************************************************/
 
@@ -177,25 +174,26 @@
 #define PX4_SPI_BUS_RAMTRON  PX4_SPI_BUS_MEMORY
 /* ^ END Legacy SPI defines TODO: fix this with enumeration */
 
-#define PX4_SPIDEV_RM               PX4_MK_SPI_SEL(PX4_SPI_BUS_SENSORS,0)
-#define PX4_SPIDEV_ICM_20689        PX4_MK_SPI_SEL(PX4_SPI_BUS_SENSORS,1)
+#include <drivers/drv_sensor.h>
+#define PX4_SPIDEV_RM               PX4_MK_SPI_SEL(0,DRV_MAG_DEVTYPE_RM3100)
+#define PX4_SPIDEV_ICM_20689        PX4_MK_SPI_SEL(0,DRV_IMU_DEVTYPE_ICM20689)
 #define PX4_SENSOR_BUS_CS_GPIO      {GPIO_SPI1_CS1_RM3100, GPIO_SPI1_CS2_ICM20689}
 
 #define PX4_SPIDEV_MEMORY           PX4_MK_SPI_SEL(PX4_SPI_BUS_MEMORY,0)
 #define PX4_MEMORY_BUS_CS_GPIO      {GPIO_SPI2_CS_FRAM}
 
-#define PX4_SPIDEV_BARO             PX4_MK_SPI_SEL(PX4_SPI_BUS_BARO,0)
-#define PX4_SPIDEV_BMI088_GYR       PX4_MK_SPI_SEL(PX4_SPI_BUS_BARO,1)
-#define PX4_SPIDEV_BMI088_ACC       PX4_MK_SPI_SEL(PX4_SPI_BUS_BARO,2)
+#define PX4_SPIDEV_BARO             PX4_MK_SPI_SEL(0,DRV_BARO_DEVTYPE_MS5611)
+#define PX4_SPIDEV_BMI088_GYR       PX4_MK_SPI_SEL(0,DRV_GYR_DEVTYPE_BMI088)
+#define PX4_SPIDEV_BMI088_ACC       PX4_MK_SPI_SEL(0,DRV_ACC_DEVTYPE_BMI088)
 #define PX4_BARO_BUS_CS_GPIO        {GPIO_SPI4_CS1_MS5611, GPIO_SPI4_CS2_BMI088_GYRO, GPIO_SPI4_CS3_BMI088_ACC}
 
 
-#define PX4_SPIDEV_EXTERNAL1_1      PX4_MK_SPI_SEL(PX4_SPI_BUS_EXTERNAL1,0)
-#define PX4_SPIDEV_EXTERNAL1_2      PX4_MK_SPI_SEL(PX4_SPI_BUS_EXTERNAL1,1)
+#define PX4_SPIDEV_EXTERNAL1_1      PX4_MK_SPI_SEL(0,0)
+#define PX4_SPIDEV_EXTERNAL1_2      PX4_MK_SPI_SEL(0,1)
 #define PX4_EXTERNAL1_BUS_CS_GPIO   {SPI5_CS1_EXTERNAL1, SPI5_CS2_EXTERNAL1}
 
-#define PX4_SPIDEV_EXT_BARO         PX4_MK_SPI_SEL(PX4_SPI_BUS_EXTERNAL2,0)
-#define PX4_SPIDEV_ICM_20649        PX4_MK_SPI_SEL(PX4_SPI_BUS_EXTERNAL2,1)
+#define PX4_SPIDEV_EXT_BARO         PX4_MK_SPI_SEL(0,DRV_BARO_DEVTYPE_MS5611)
+#define PX4_SPIDEV_ICM_20649        PX4_MK_SPI_SEL(0,1)
 #define PX4_SPIDEV_EXT_MPU         1//PX4_MK_SPI_SEL(PX4_SPI_BUS_EXTERNAL2,2)
 #define PX4_EXTERNAL2_BUS_CS_GPIO   {SPI6_CS1_MS5611_BOARD, SPI6_CS2_ICM20649}
 
@@ -371,7 +369,6 @@
 //#define VDD_3V3_SPEKTRUM_POWER_EN(on_true) px4_arch_gpiowrite(GPIO_VDD_3V3_SPEKTRUM_POWER_EN, (on_true))
 //#define READ_VDD_3V3_SPEKTRUM_POWER_EN()   px4_arch_gpioread(GPIO_VDD_3V3_SPEKTRUM_POWER_EN)
 #define VDD_3V3_SD_CARD_EN(on_true)        px4_arch_gpiowrite(GPIO_VDD_3V3_SD_CARD_EN, (on_true))
-
 
 /* Tone alarm output */
 
@@ -577,8 +574,6 @@ int stm32_sdio_initialize(void);
  ****************************************************************************************************/
 
 extern void stm32_spiinitialize(void);
-
-void board_spi_reset(int ms);
 
 extern void stm32_usbinitialize(void);
 

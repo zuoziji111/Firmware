@@ -46,13 +46,10 @@ px4_add_board(
 		pca9685
 		power_monitor/ina226
 		#protocol_splitter
-#		pwm_input  - Need to create arch/stm32 arch/stm32h7 arch/kinetis and reloacate
-#					   all arch dependant code there
 		pwm_out_sim
 		px4fmu
 		px4io
 		rc_input
-
 		rpm
 		safety_button
 		tap_esc
@@ -117,7 +114,6 @@ px4_add_board(
 		ver
 		work_queue
 	EXAMPLES
-		bottle_drop # OBC challenge
 		fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
 		hello
 		hwtest # Hardware test
