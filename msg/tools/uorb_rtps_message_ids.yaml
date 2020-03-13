@@ -158,8 +158,6 @@ rtps:
     id: 67
   - msg: sensor_mag
     id: 68
-  - msg: sensor_preflight
-    id: 69
   - msg: sensor_selection
     id: 70
     send: true
@@ -301,6 +299,10 @@ rtps:
     id: 134
   - msg: yaw_estimator_status
     id: 135
+  - msg: sensor_preflight_imu
+    id: 136
+  - msg: sensor_preflight_mag
+    id: 137
   ########## multi topics: begin ##########
   - msg: actuator_controls_0
     id: 150

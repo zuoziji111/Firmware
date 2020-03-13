@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2017 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2012-2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,22 +30,3 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-
-#pragma once
-
-/**
- * @file common.h
- * common definitions used in sensors module
- *
- * @author Beat Kueng <beat-kueng@gmx.net>
- */
-
-namespace sensors
-{
-
-constexpr uint8_t GYRO_COUNT_MAX = 3;
-constexpr uint8_t ACCEL_COUNT_MAX = 3;
-
-constexpr uint8_t SENSOR_COUNT_MAX = math::max(GYRO_COUNT_MAX, ACCEL_COUNT_MAX);
-
-} /* namespace sensors */

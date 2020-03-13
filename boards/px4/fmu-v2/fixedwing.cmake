@@ -24,7 +24,10 @@ px4_add_board(
 		camera_capture
 		camera_trigger
 		differential_pressure # all available differential pressure drivers
-		distance_sensor # all available distance sensor drivers
+		#distance_sensor # all available distance sensor drivers
+		distance_sensor/ll40ls
+		distance_sensor/sf0x
+		distance_sensor/sf1xx
 		gps
 		imu/l3gd20
 		imu/lsm303d
@@ -72,7 +75,7 @@ px4_add_board(
 		mtd
 		#nshterm
 		param
-		perf
+		#perf
 		pwm
 		reboot
 		#sd_bench

@@ -65,10 +65,9 @@
 #include <uORB/topics/airspeed.h>
 #include <uORB/topics/differential_pressure.h>
 #include <uORB/topics/parameter_update.h>
-#include <uORB/topics/sensor_preflight.h>
+#include <uORB/topics/sensor_preflight_imu.h>
 #include <uORB/topics/vehicle_air_data.h>
 #include <uORB/topics/vehicle_control_mode.h>
-#include <uORB/topics/vehicle_magnetometer.h>
 
 #include "parameters.h"
 #include "voted_sensors_update.h"
@@ -76,6 +75,7 @@
 #include "vehicle_angular_velocity/VehicleAngularVelocity.hpp"
 #include "vehicle_air_data/VehicleAirData.hpp"
 #include "vehicle_imu/VehicleIMU.hpp"
+#include "vehicle_magnetometer/VehicleMagnetometer.hpp"
 
 using namespace sensors;
 using namespace time_literals;
@@ -114,10 +114,9 @@ private:
 
 	hrt_abstime     _last_config_update{0};
 	hrt_abstime     _sensor_combined_prev_timestamp{0};
-	hrt_abstime     _magnetometer_prev_timestamp{0};
 
 	sensor_combined_s _sensor_combined{};
-	sensor_preflight_s _sensor_preflight{};
+	sensor_preflight_imu_s _sensor_preflight_imu{};
 
 	uORB::Subscription	_actuator_ctrl_0_sub{ORB_ID(actuator_controls_0)};		/**< attitude controls sub */
 	uORB::Subscription	_diff_pres_sub{ORB_ID(differential_pressure)};			/**< raw differential pressure subscription */
@@ -127,8 +126,7 @@ private:
 
 	uORB::Publication<airspeed_s>			_airspeed_pub{ORB_ID(airspeed)};			/**< airspeed */
 	uORB::Publication<sensor_combined_s>		_sensor_pub{ORB_ID(sensor_combined)};			/**< combined sensor data topic */
-	uORB::Publication<sensor_preflight_s>		_sensor_preflight_pub{ORB_ID(sensor_preflight)};		/**< sensor preflight topic */
-	uORB::Publication<vehicle_magnetometer_s>	_magnetometer_pub{ORB_ID(vehicle_magnetometer)};	/**< combined sensor data topic */
+	uORB::Publication<sensor_preflight_imu_s>	_sensor_preflight_imu_pub{ORB_ID(sensor_preflight_imu)};		/**< sensor preflight topic */
 
 	uORB::SubscriptionCallbackWorkItem _sensor_gyro_integrated_sub[GYRO_COUNT_MAX] {
 		{this, ORB_ID(sensor_gyro_integrated), 0},
@@ -160,6 +158,7 @@ private:
 	VehicleAcceleration	_vehicle_acceleration;
 	VehicleAngularVelocity	_vehicle_angular_velocity;
 	VehicleAirData          _vehicle_air_data;
+	VehicleMagnetometer     _vehicle_magnetometer;
 
 	static constexpr int MAX_SENSOR_COUNT = 3;
 	VehicleIMU      *_vehicle_imu_list[MAX_SENSOR_COUNT] {};
@@ -487,8 +486,7 @@ void Sensors::Run()
 		}
 	}
 
-	vehicle_magnetometer_s magnetometer{};
-	_voted_sensors_update.sensorsPoll(_sensor_combined, magnetometer);
+	_voted_sensors_update.sensorsPoll(_sensor_combined);
 
 	// check analog airspeed
 	adc_poll();
@@ -521,15 +519,6 @@ void Sensors::Run()
 		}
 	}
 
-	if ((magnetometer.timestamp != 0) && (magnetometer.timestamp != _magnetometer_prev_timestamp)) {
-		_magnetometer_pub.publish(magnetometer);
-		_magnetometer_prev_timestamp = magnetometer.timestamp;
-
-		if (!_armed) {
-			_voted_sensors_update.calcMagInconsistency(_sensor_preflight);
-		}
-	}
-
 	if (_sensor_combined.timestamp != _sensor_combined_prev_timestamp) {
 
 		_voted_sensors_update.setRelativeTimestamps(_sensor_combined);
@@ -539,11 +528,11 @@ void Sensors::Run()
 		// If the the vehicle is disarmed calculate the length of the maximum difference between
 		// IMU units as a consistency metric and publish to the sensor preflight topic
 		if (!_armed) {
-			_voted_sensors_update.calcAccelInconsistency(_sensor_preflight);
-			_voted_sensors_update.calcGyroInconsistency(_sensor_preflight);
+			_voted_sensors_update.calcAccelInconsistency(_sensor_preflight_imu);
+			_voted_sensors_update.calcGyroInconsistency(_sensor_preflight_imu);
 
-			_sensor_preflight.timestamp = hrt_absolute_time();
-			_sensor_preflight_pub.publish(_sensor_preflight);
+			_sensor_preflight_imu.timestamp = hrt_absolute_time();
+			_sensor_preflight_imu_pub.publish(_sensor_preflight_imu);
 		}
 	}
 
@@ -668,7 +657,7 @@ The provided functionality includes:
 - Make sure the sensor drivers get the updated calibration parameters (scale & offset) when the parameters change or
   on startup. The sensor drivers use the ioctl interface for parameter updates. For this to work properly, the
   sensor drivers must already be running when `sensors` is started.
-- Do preflight sensor consistency checks and publish the `sensor_preflight` topic.
+- Do preflight sensor consistency checks and publish the `sensor_preflight_imu` topic.
 
 ### Implementation
 It runs in its own thread and polls on the currently selected gyro topic.
