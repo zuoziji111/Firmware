@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2020 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,15 +30,17 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
+
 px4_add_module(
-	MODULE drivers__qmc5883
-	MAIN qmc5883
+	MODULE drivers__magnetometer__qmc5883l
+	MAIN qmc5883l
 	COMPILE_FLAGS
-		-Wno-cast-align # TODO: fix and enable
 	SRCS
-		qmc5883_i2c.cpp
-		qmc5883_spi.cpp
-		qmc5883.cpp
+		QMC5883L.cpp
+		QMC5883L.hpp
+		qmc5883l_main.cpp
+		QST_QMC5883L_registers.hpp
 	DEPENDS
+		drivers_magnetometer
 		px4_work_queue
 	)

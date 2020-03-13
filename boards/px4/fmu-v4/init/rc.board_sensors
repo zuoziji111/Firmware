@@ -18,7 +18,7 @@ fmu sensor_reset 50
 hmc5883 -C -T -X start
 lis3mdl -X start
 ist8310 start
-qmc5883 -X start
+qmc5883l start
 rm3100 start
 
 # Internal SPI

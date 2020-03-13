@@ -27,7 +27,7 @@ bmi055 -G -R 10 start
 ist8310 -b 1 start
 ist8310 -b 2 start
 hmc5883 -C -T -X start
-qmc5883 -X start
+qmc5883l start
 lis3mdl -X start
 
 # ICM20948 as external magnetometer on I2C (e.g. Here GPS)

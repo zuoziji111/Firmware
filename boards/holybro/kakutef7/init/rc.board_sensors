@@ -18,4 +18,5 @@ bmp280 start
 ist8310 -b 1 start
 ist8310 -b 2 start
 hmc5883 -C -T -X start
-qmc5883 -X start
+qmc5883l -b 1 start
+qmc5883l -b 2 start

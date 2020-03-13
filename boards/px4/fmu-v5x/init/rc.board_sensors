@@ -25,7 +25,7 @@ bmi088 -G -R 12 start
 ist8310 -b 1 start
 ist8310 -b 2 start
 hmc5883 -C -T -X start
-qmc5883 -X start
+qmc5883l start
 
 # Possible internal compass
 bmm150 start
