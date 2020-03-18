@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2019 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,8 +47,8 @@ static int start(enum Rotation rotation)
 	}
 
 	// create the driver
-#if defined(PX4_SPI_BUS_1) && defined(PX4_SPIDEV_ICM_20948)
-	g_dev = new ICM20649(PX4_SPI_BUS_1, PX4_SPIDEV_ICM_20948, rotation);
+#if defined(PX4_SPI_BUS_1) && defined(PX4_SPIDEV_ICM_20649)
+	g_dev = new ICM20649(PX4_SPI_BUS_1, PX4_SPIDEV_ICM_20649, rotation);
 #endif
 
 	if (g_dev == nullptr) {
