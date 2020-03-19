@@ -60,12 +60,17 @@ class List
 {
 public:
 
-	void add(T newNode)
+	bool add(T newNode)
 	{
+		// if newNode already has a sibling don't allow it to be added
+		if (newNode->getSibling() != nullptr) {
+			return false;
+		}
+
 		if (_head == nullptr) {
 			// list is empty, add as head
 			_head = newNode;
-			return;
+			return true;
 
 		} else {
 			// find last node and add to end
@@ -75,12 +80,14 @@ public:
 				if (node->getSibling() == nullptr) {
 					// found last node, now add newNode
 					node->setSibling(newNode);
-					return;
+					return true;
 				}
 
 				node = node->getSibling();
 			}
 		}
+
+		return false;
 	}
 
 	bool remove(T removeNode)
@@ -95,6 +102,8 @@ public:
 				_head = _head->getSibling();
 			}
 
+			removeNode->setSibling(nullptr);
+
 			return true;
 		}
 
@@ -108,6 +117,8 @@ public:
 				} else {
 					node->setSibling(nullptr);
 				}
+
+				removeNode->setSibling(nullptr);
 
 				return true;
 			}
