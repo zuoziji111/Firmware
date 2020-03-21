@@ -41,6 +41,12 @@ pipeline {
               mission: "FW_mission_1",
               vehicle: "plane"
             ],
+            [
+              name: "FW_catapult",
+              test: "mavros_posix_test_mission.test",
+              mission: "FW_mission_1",
+              vehicle: "plane_catapult"
+            ],
 
             [
               name: "MC_box",
