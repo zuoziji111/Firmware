@@ -175,18 +175,9 @@ public:
 	 */
 	int update_queue_size(unsigned int queue_size);
 
-	/**
-	 * Print statistics (nr of lost messages)
-	 * @param reset if true, reset statistics afterwards
-	 * @return true if printed something, false otherwise (if no lost messages)
-	 */
-	bool print_statistics(bool reset);
-
 	uint8_t get_queue_size() const { return _queue_size; }
 
 	int8_t subscriber_count() const { return _subscriber_count; }
-
-	uint32_t lost_message_count() const { return _lost_messages; }
 
 	unsigned published_message_count() const { return _generation.load(); }
 
@@ -258,10 +249,6 @@ private:
 	uint8_t     *_data{nullptr};   /**< allocated object buffer */
 	px4::atomic<unsigned>  _generation{0};  /**< object generation count */
 	List<uORB::SubscriptionCallback *>	_callbacks;
-
-	// statistics
-	uint32_t _lost_messages = 0; /**< nr of lost messages for all subscribers. If two subscribers lose the same
-					message, it is counted as two. */
 
 	const uint8_t _instance; /**< orb multi instance identifier */
 	uint8_t _priority;  /**< priority of the topic */

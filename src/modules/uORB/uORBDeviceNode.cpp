@@ -138,49 +138,39 @@ uORB::DeviceNode::close(cdev::file_t *filp)
 	return CDev::close(filp);
 }
 
-bool
-uORB::DeviceNode::copy_locked(void *dst, unsigned &generation)
+bool uORB::DeviceNode::copy(void *dst, unsigned &generation)
 {
-	bool updated = false;
-
 	if ((dst != nullptr) && (_data != nullptr)) {
-		unsigned current_generation = _generation.load();
+		for (int i = 0; i < 100; i++) {
+			unsigned gen = generation;
+			const unsigned current_generation = _generation.load();
 
-		if (current_generation > generation + _queue_size) {
-			// Reader is too far behind: some messages are lost
-			_lost_messages += current_generation - (generation + _queue_size);
-			generation = current_generation - _queue_size;
+			if (current_generation > gen + _queue_size) {
+				// Reader is too far behind: some messages are lost
+				gen = current_generation - _queue_size;
+			}
+
+			if ((current_generation == gen) && (gen > 0)) {
+				/* The subscriber already read the latest message, but nothing new was published yet.
+				* Return the previous message
+				*/
+				--gen;
+			}
+
+			memcpy(dst, _data + (_meta->o_size * (gen % _queue_size)), _meta->o_size);
+
+			if (gen < current_generation) {
+				++gen;
+			}
+
+			if (current_generation == _generation.load()) {
+				generation = gen;
+				return true;
+			}
 		}
-
-		if ((current_generation == generation) && (generation > 0)) {
-			/* The subscriber already read the latest message, but nothing new was published yet.
-			 * Return the previous message
-			 */
-			--generation;
-		}
-
-		memcpy(dst, _data + (_meta->o_size * (generation % _queue_size)), _meta->o_size);
-
-		if (generation < current_generation) {
-			++generation;
-		}
-
-		updated = true;
 	}
 
-	return updated;
-}
-
-bool
-uORB::DeviceNode::copy(void *dst, unsigned &generation)
-{
-	ATOMIC_ENTER;
-
-	bool updated = copy_locked(dst, generation);
-
-	ATOMIC_LEAVE;
-
-	return updated;
+	return false;
 }
 
 ssize_t
@@ -208,11 +198,14 @@ uORB::DeviceNode::read(cdev::file_t *filp, char *buffer, size_t buflen)
 		sd->update_interval->last_update = hrt_absolute_time();
 	}
 
-	copy_locked(buffer, sd->generation);
+	if (copy(buffer, sd->generation)) {
+		ATOMIC_LEAVE;
+		return _meta->o_size;
+	}
 
 	ATOMIC_LEAVE;
 
-	return _meta->o_size;
+	return 0;
 }
 
 ssize_t
@@ -501,27 +494,6 @@ uORB::DeviceNode::appears_updated(SubscriberData *sd)
 
 	// finally, compare the generation
 	return (sd->generation != published_message_count());
-}
-
-bool
-uORB::DeviceNode::print_statistics(bool reset)
-{
-	if (!_lost_messages) {
-		return false;
-	}
-
-	lock();
-	//This can be wrong: if a reader never reads, _lost_messages will not be increased either
-	uint32_t lost_messages = _lost_messages;
-
-	if (reset) {
-		_lost_messages = 0;
-	}
-
-	unlock();
-
-	PX4_INFO("%s: %i", _meta->o_name, lost_messages);
-	return true;
 }
 
 void uORB::DeviceNode::add_internal_subscriber()

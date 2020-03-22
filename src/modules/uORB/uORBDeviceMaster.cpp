@@ -184,13 +184,11 @@ void uORB::DeviceMaster::printStatistics(bool reset)
 	_last_statistics_output = current_time;
 
 	PX4_INFO("TOPIC, NR LOST MSGS");
-	bool had_print = false;
 
 	/* Add all nodes to a list while locked, and then print them in unlocked state, to avoid potential
 	 * dead-locks (where printing blocks) */
 	lock();
 	DeviceNodeStatisticsData *first_node = nullptr;
-	DeviceNodeStatisticsData *cur_node = nullptr;
 	size_t max_topic_name_length = 0;
 	int num_topics = 0;
 	int ret = addNewDeviceNodes(&first_node, num_topics, max_topic_name_length, nullptr, 0);
@@ -198,22 +196,6 @@ void uORB::DeviceMaster::printStatistics(bool reset)
 
 	if (ret != 0) {
 		PX4_ERR("addNewDeviceNodes failed (%i)", ret);
-	}
-
-	cur_node = first_node;
-
-	while (cur_node) {
-		if (cur_node->node->print_statistics(reset)) {
-			had_print = true;
-		}
-
-		DeviceNodeStatisticsData *prev = cur_node;
-		cur_node = cur_node->next;
-		delete prev;
-	}
-
-	if (!had_print) {
-		PX4_INFO("No lost messages");
 	}
 }
 
@@ -279,7 +261,7 @@ int uORB::DeviceMaster::addNewDeviceNodes(DeviceNodeStatisticsData **first_node,
 			max_topic_name_length = name_length;
 		}
 
-		last_node->last_lost_msg_count = last_node->node->lost_message_count();
+		last_node->last_lost_msg_count = 0;
 		last_node->last_pub_msg_count = last_node->node->published_message_count();
 	}
 
@@ -381,7 +363,7 @@ void uORB::DeviceMaster::showTop(char **topic_filter, int num_filters)
 			cur_node = first_node;
 
 			while (cur_node) {
-				uint32_t num_lost = cur_node->node->lost_message_count();
+				uint32_t num_lost = 0;
 				unsigned int num_msgs = cur_node->node->published_message_count();
 				cur_node->pub_msg_delta = (num_msgs - cur_node->last_pub_msg_count) / dt;
 				cur_node->lost_msg_delta = (num_lost - cur_node->last_lost_msg_count) / dt;
