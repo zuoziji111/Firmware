@@ -8,14 +8,14 @@ adc start
 # Internal ICM-20602
 mpu6000 -R 10 -s -T 20602 start
 
-# Internal ICM-20689
-#icm20689 -s -R 10 start
-
 # Internal SPI bus BMI088 accel
 bmi088 -A -R 10 -s start
 
 # Internal SPI bus BMI088 gyro
 bmi088 -G -R 10 -s start
+
+# Internal ICM-20948
+icm20948 -s -R 2 start
 
 # Interal DPS310 (barometer)
 dps310 -s start
