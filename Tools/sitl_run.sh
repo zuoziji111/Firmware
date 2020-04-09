@@ -124,7 +124,8 @@ elif [ "$program" == "gazebo" ] && [ ! -n "$no_sim" ]; then
 elif [ "$program" == "airsim" ] && [ ! -n "$no_sim" ]; then
 	if [ "$model" == "iris" ]; then
 		if [ -f ${AIRSIM_APPLICATION_PATH} ]  && [ ! -z ${AIRSIM_APPLICATION_PATH} ]; then
-			${AIRSIM_APPLICATION_PATH}
+			${AIRSIM_APPLICATION_PATH} -windowed -ResX 640 -ResY 480 > /dev/null 2>&1 &
+			SIM_PID=`echo $!`
 		else
 			echo "Could not find Airsim at AIRSIM_APPLICATION_PATH=${AIRSIM_APPLICATION_PATH}"
 			exit 1
@@ -183,4 +184,7 @@ elif [ "$program" == "gazebo" ]; then
 	if [[ ! -n "$HEADLESS" ]]; then
 		kill -9 $GUI_PID
 	fi
+elif [ "$program" == "airsim" ]; then
+	pkill -9 -P $SIM_PID
+	kill -9 $SIM_PID
 fi
